@@ -1,0 +1,49 @@
+macOS set-up checklist
+======================
+
+[ ] - Apple's DEP
+[ ] - System Preferences
+[ ] - ~/.ssh
+[ ] - ~/.gnupg
+[ ] - git clone git@github.com:hrvladev/dotfiles.git && cd dotfiles && ./install
+[ ] - ~/.scratchpads
+[ ] - ~/.config/tmuxinator/
+[ ] - Homebrew (https://brew.sh)
+[ ] - brew install gnupg
+[ ] - brew install pinentry-mac (macOS keychain & GPG passphrases)
+[ ] - brew install fish
+[ ] - brew install git
+[ ] - brew install neovim
+[ ] - brew install fzf
+[ ] - brew install ripgrep
+[ ] - brew install ruby-install
+[ ] - ruby-install ruby
+[ ] - brew install chruby
+[ ] - brew install chruby-fish
+[ ] - brew install tmux
+[ ] - brew install tmuxinator
+[ ] - brew install tree
+[ ] - brew install htop
+[ ] - Cleanup config files from zsh, bash, vim, etc located in home dir
+[ ] - App Store (Pages, Numbers, Keynote, iMovie, GarageBand, Xcode)
+[ ] - mkdir ~/Applications
+[ ] - Alfred
+[ ] - Discord
+[ ] - Docker
+[ ] - Firefox
+[ ] - Google Chrome
+[ ] - Guitar Pro
+[ ] - Notion
+[ ] - Rectangle
+[ ] - Slack
+[ ] - Spotify
+[ ] - Steam
+[ ] - Telegram
+[ ] - The Unarchiver
+[ ] - Transmission
+[ ] - VLC
+[ ] - VS Code
+[ ] - Wally (ergodox ez keyboard)
+[ ] - iTerm
+[ ] - Install Fonts [ Hack ]
+[ ] - Copy data from the backup drive
