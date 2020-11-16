@@ -1,0 +1,12 @@
+[user]
+	email = hvladev@funkyparentheses.com
+	name = Hristo Vladev
+	signingkey = 593691B5C0EFEF11
+[rerere]
+	enabled = true
+[commit]
+	gpgsign = true
+[fetch]
+	prune = true
+[pull]
+	rebase = false

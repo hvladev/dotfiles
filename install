@@ -1,0 +1,55 @@
+#!/usr/bin/env bash
+
+dotfiles_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
+
+if ! [[ -d ~/.config ]]; then
+  mkdir ~/.config
+fi
+
+function print_success () { echo "  ✅ $1... done!"; }
+function print_warning () { echo "  ⚠️  $1 config already present!"; }
+
+echo
+
+# Fish
+if [[ -e ~/.config/fish ]]; then
+  print_warning "Fish"
+else
+  ln -s $dotfiles_dir/fish/ ~/.config/fish
+  print_success "Fish"
+fi
+
+# Git
+if [[ -e ~/.config/git ]]; then
+  print_warning "Git"
+else
+  ln -s $dotfiles_dir/git/ ~/.config/git
+  print_success "Git"
+fi
+
+# NeoVim
+if [[ -e ~/.config/nvim ]]; then
+  print_warning "NeoVim"
+else
+  ln -s $dotfiles_dir/nvim/ ~/.config/nvim
+  print_success "NeoVim"
+fi
+
+# tmux
+if [[ -e ~/.tmux.conf ]]; then
+  print_warning "tmux"
+else
+  ln -s $dotfiles_dir/tmux.conf ~/.tmux.conf
+  print_success "tmux"
+fi
+
+# Ruby
+if [[ -e ~/.ruby-version ]]; then
+  print_warning "Ruby"
+else
+  ln -s $dotfiles_dir/ruby-version ~/.ruby-version
+  print_success "Ruby"
+fi
+
+echo
+echo "  🚀 Coding time!"
