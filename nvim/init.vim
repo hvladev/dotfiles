@@ -45,14 +45,6 @@ set tabstop=2
 " }}} ========================================================================
 " Functions {{{ ==============================================================
 
-function! s:HighlightGroupUnderCursor()
-  if !exists("*synstack")
-    return
-  endif
-
-  echo map(synstack(line('.'), col('.')), 'synIDattr(v:val, "name")')
-endfunc
-
 function! s:OpenHelpInNewTab()
   if &buftype == 'help'
     if winnr('$') > 1
@@ -61,16 +53,6 @@ function! s:OpenHelpInNewTab()
 
     nnoremap <buffer> q :q<cr>
   endif
-endfunction
-
-function! s:RubyTestFile(filename)
-  execute 'tabnew | terminal ++curwin /usr/local/bin/ruby-test ' . a:filename
-
-  nnoremap <buffer> q :q<cr>
-endfunction
-
-function! s:RubyTestUnderCursor(filename, line_number)
-  call <SID>RubyTestFile(a:filename . ':' . a:line_number)
 endfunction
 
 " }}} ========================================================================
@@ -143,26 +125,21 @@ nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
 
 " Switch to alternate buffer
-nnoremap <Leader><TAB> <C-^>
+nnoremap <leader><TAB> <C-^>
 
 " Splits
-nnoremap <Leader>\| :vsplit<CR>
-nnoremap <Leader>- :split<CR>
+nnoremap <leader>\| :vsplit<CR>
+nnoremap <leader>- :split<CR>
 
 " Make Y behave like other capitals
 nnoremap Y y$
 
 " Clear search highlights
-nnoremap <Leader>c :nohlsearch<CR>
+nnoremap <leader>c :nohlsearch<CR>
 
 " Open/reload vimrc
 nnoremap <F1> :tabnew $MYVIMRC<CR>
 nnoremap <F2> :source $MYVIMRC<CR>
-
-" }}} ========================================================================
-" Commands {{{ ===============================================================
-
-command! HighlightGroupUnderCursor call <SID>HighlightGroupUnderCursor()
 
 " }}} ========================================================================
 " Autocommands {{{ ===========================================================
@@ -180,12 +157,6 @@ augroup END
 
 let s:statusLineSeparator = ' · '
 
-function! MyStatusLineGitInfo()
-  let l:branchName = fugitive#head()
-
-  return empty(l:branchName) ? '' : ' ᚠ '. l:branchName . s:statusLineSeparator "repeat(' ', 5)
-endfunction
-
 function! MyStatusLineFileEOL()
   let l:eol = get({'dos': 'CRLF', 'unix': 'LF', 'mac': 'CR'}, &fileformat, '')
 
@@ -200,7 +171,6 @@ function! MyStatusLineFiletype()
   return empty(&filetype) ? '' : &filetype . s:statusLineSeparator
 endfunction
 
-"       \ '%{MyStatusLineGitInfo()}' .
 function! MyStatusLine()
   return ' %t %m%r ' .
        \ '%=%<' .
@@ -270,10 +240,10 @@ endfunction
 
 set foldtext=MyFoldText()
 
-nnoremap <Leader>fj zo
-nnoremap <Leader>fk zc
-nnoremap <Leader>fa zR
-nnoremap <Leader>fA zM
+nnoremap <leader>fj zo
+nnoremap <leader>fk zc
+nnoremap <leader>fa zR
+nnoremap <leader>fA zM
 
 " }}} ========================================================================
 
@@ -391,16 +361,6 @@ colorscheme quill
 " colorscheme solarized8_flat
 
 " }}} ========================================================================
-" Tests {{{ ==================================================================
-
-" augroup ruby_test
-"   autocmd!
-
-"   autocmd FileType ruby nnoremap <buffer> <leader>l :call <SID>RubyTestFile(expand('%'))<CR>
-"   autocmd FileType ruby nnoremap <buffer> <leader>L :call <SID>RubyTestUnderCursor(expand('%'), line('.'))<CR>
-" augroup END
-
-" }}} ========================================================================
 " vim-test {{{ ===============================================================
 
 let test#strategy = 'neovim'
@@ -422,8 +382,9 @@ augroup END
 let g:slime_no_mappings = 1
 let g:slime_dont_ask_default = 1
 
-vmap <Leader>r <Plug>SlimeRegionSend
-nmap <Leader>r <Plug>SlimeParagraphSend
+vmap <leader>r <Plug>SlimeRegionSend
+nmap <leader>r <Plug>SlimeParagraphSend
+nmap <leader>R :%SlimeSend<CR>
 
 let g:slime_target = "tmux"
 let g:slime_default_config = {"socket_name": "default", "target_pane": "2"}
