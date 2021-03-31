@@ -271,6 +271,7 @@ Plug 'sheerun/vim-polyglot'
 " Themes
 Plug 'hvladev/quill'
 Plug 'lifepillar/vim-solarized8'
+Plug 'mhartington/oceanic-next'
 
 " Git & GitHub
 Plug 'tpope/vim-fugitive'
@@ -355,7 +356,11 @@ nmap <leader>, <Plug>(easymotion-bd-jk)
 " }}} ========================================================================
 " Themes {{{ =================================================================
 
-colorscheme quill
+" colorscheme quill
+
+let g:oceanic_next_terminal_bold = 1
+let g:oceanic_next_terminal_italic = 1
+colorscheme OceanicNext
 
 " set background=light
 " colorscheme solarized8_flat
