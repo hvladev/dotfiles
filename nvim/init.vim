@@ -280,6 +280,8 @@ Plug 'junegunn/gv.vim'
 
 " Ruby
 Plug 'tpope/vim-rails'
+Plug 'kana/vim-textobj-user'
+Plug 'nelstrom/vim-textobj-rubyblock'
 " Plug 'vim-ruby/vim-ruby'
 
 " JavaScript, TypeScript, jsx, tsx
