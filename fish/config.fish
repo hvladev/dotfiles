@@ -1,3 +1,5 @@
+fish_add_path /opt/homebrew/bin
+
 # Locale variables
 
 set -x LC_ALL en_US.UTF-8
@@ -8,14 +10,15 @@ set -g __fish_git_prompt_showcolorhints 1
 set -g __fish_git_prompt_char_stateseparator ' '
 
 # Configure chruby
-source /usr/local/share/chruby/chruby.fish
-source /usr/local/share/chruby/auto.fish
+set -x CHRUBY_ROOT /opt/homebrew/opt/chruby
+source /opt/homebrew/opt/chruby-fish/share/chruby/chruby.fish
+source /opt/homebrew/opt/chruby-fish/share/chruby/auto.fish
 
 # Configure asdf
-source /usr/local/opt/asdf/asdf.fish
+# source /usr/local/opt/asdf/asdf.fish
 
 set -x EDITOR nvim
-set -x DISABLE_SPRING 1
+# set -x DISABLE_SPRING 1
 
 # GPG
 set -x GPG_TTY (tty)
@@ -45,6 +48,7 @@ end
 abbr --add --global e $EDITOR
 
 abbr --add --global chkx tmuxinator start checkoutx
+abbr --add --global bee tmuxinator start bundlebee
 
 abbr --add --global g git
 abbr --add --global gs git status
@@ -61,3 +65,5 @@ abbr --add --global grm git rebase -i --autosquash origin/master
 
 abbr --add --global h heroku
 abbr --add --global hr heroku run
+
+abbr --add --global lg lazygit

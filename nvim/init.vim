@@ -8,6 +8,7 @@ filetype plugin indent on
 
 set autoread
 set clipboard+=unnamedplus
+set spelllang=en_us
 set undofile
 set undolevels=3000
 set undoreload=10000
@@ -41,6 +42,9 @@ set smartcase
 set expandtab
 set shiftwidth=2
 set tabstop=2
+
+autocmd FileType eruby setlocal tabstop=2 shiftwidth=2 softtabstop=2
+autocmd FileType javascript setlocal tabstop=2 shiftwidth=2 softtabstop=2
 
 " }}} ========================================================================
 " Functions {{{ ==============================================================
@@ -141,6 +145,10 @@ nnoremap <leader>c :nohlsearch<CR>
 nnoremap <F1> :tabnew $MYVIMRC<CR>
 nnoremap <F2> :source $MYVIMRC<CR>
 
+" Open current file's directory in a split
+nnoremap <leader>e :Vexplore!<CR>
+nnoremap <leader>E :Lexplore!<CR>
+
 " }}} ========================================================================
 " Autocommands {{{ ===========================================================
 
@@ -232,7 +240,7 @@ set tabline=%!MyTabLine()
 
 set fillchars+=fold:\ ,
 set foldcolumn=2
-set foldenable
+set nofoldenable
 
 function! MyFoldText()
   return substitute(foldtext(), '+-\+\|\s\+\d\+ lines: ', '', 'g')
@@ -253,7 +261,7 @@ nnoremap <leader>fA zM
 call plug#begin(stdpath('data') . '/plugged')
 
 " Misc
-Plug '/usr/local/opt/fzf'
+Plug '/opt/homebrew/opt/fzf'
 Plug 'junegunn/fzf.vim'
 Plug 'jiangmiao/auto-pairs'
 Plug 'easymotion/vim-easymotion'
@@ -266,7 +274,16 @@ Plug 'jpalardy/vim-slime'
 Plug 'pbrisbin/vim-mkdir'
 Plug 'tpope/vim-eunuch'
 
+Plug 'evanleck/vim-svelte'
+
 Plug 'sheerun/vim-polyglot'
+
+" Trying new stuff
+Plug 'nvim-treesitter/nvim-treesitter', {'do': ':TSUpdate'}
+Plug 'tjdevries/colorbuddy.vim'
+Plug 'Th3Whit3Wolf/onebuddy'
+Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
+Plug 'dense-analysis/ale'
 
 " Themes
 Plug 'hvladev/quill'
@@ -282,12 +299,16 @@ Plug 'junegunn/gv.vim'
 Plug 'tpope/vim-rails'
 Plug 'kana/vim-textobj-user'
 Plug 'nelstrom/vim-textobj-rubyblock'
-" Plug 'vim-ruby/vim-ruby'
+Plug 'vim-ruby/vim-ruby'
+
+" LISP
+Plug 'guns/vim-sexp'
+Plug 'tpope/vim-sexp-mappings-for-regular-people'
 
 " JavaScript, TypeScript, jsx, tsx
 " Plug 'yuezk/vim-js'
 " Plug 'HerringtonDarkholme/yats.vim'
-" Plug 'maxmellon/vim-jsx-pretty'
+Plug 'maxmellon/vim-jsx-pretty'
 " Plug 'othree/javascript-libraries-syntax.vim'
 
 " GraphQL
@@ -304,18 +325,16 @@ call plug#end()
 " Fzf {{{ ====================================================================
 
 let $FZF_DEFAULT_OPTS='--reverse'
-
 let g:fzf_layout =
 \ {
 \   'window': {
 \     'width': 0.9,
-\     'height': 0.5,
+\     'height': 0.6,
 \     'yoffset': 0.1,
 \   }
 \ }
-
+let g:fzf_preview_window = ['down:60%:hidden', 'ctrl-/']
 let g:fzf_buffers_jump = 0
-
 let g:fzf_colors =
 \ { 'fg':      ['fg', 'Normal'],
   \ 'bg':      ['bg', 'Normal'],
@@ -334,6 +353,7 @@ let g:fzf_colors =
 nnoremap <silent> <leader>j :GFiles --cached --others --exclude-standard<cr>
 nnoremap <silent> <leader>J :FZF<cr>
 nnoremap <silent> <leader>k :Buffers<cr>
+nnoremap <silent> <leader>: :History:<cr>
 
 command! -bang -nargs=* Rg
   \ call fzf#vim#grep(
@@ -360,9 +380,9 @@ nmap <leader>, <Plug>(easymotion-bd-jk)
 
 " colorscheme quill
 
-let g:oceanic_next_terminal_bold = 1
-let g:oceanic_next_terminal_italic = 1
-colorscheme OceanicNext
+" let g:oceanic_next_terminal_bold = 1
+" let g:oceanic_next_terminal_italic = 1
+" colorscheme OceanicNext
 
 " set background=light
 " colorscheme solarized8_flat
@@ -402,3 +422,65 @@ let g:slime_default_config = {"socket_name": "default", "target_pane": "2"}
 nmap <leader>gs :Git<CR>
 
 " }}} ========================================================================
+
+
+" === Trying new stuff
+
+" treesitter
+lua <<EOF
+require'nvim-treesitter.configs'.setup {
+  highlight = {
+    enable = false,
+  },
+  incremental_selection = {
+    enable = true,
+    keymaps = {
+      init_selection = "gnn",
+      node_incremental = "grn",
+      scope_incremental = "grc",
+      node_decremental = "grm",
+    },
+  },
+  indent = {
+    enable = false
+  },
+}
+EOF
+
+set foldmethod=expr
+set foldexpr=nvim_treesitter#foldexpr()
+
+" theme
+set background=dark
+lua require('colorbuddy').colorscheme('onebuddy')
+
+highlight! StatusLine   guifg=#abb2bf guibg=#1c1f24 gui=NONE cterm=NONE
+highlight! StatusLineNC guifg=#495060 guibg=#1c1f24 gui=NONE cterm=NONE
+highlight! TabLine      guifg=#495060 guibg=#1c1f24 gui=NONE cterm=NONE
+highlight! TabLineFill  guifg=NONE    guibg=#1c1f24 gui=NONE cterm=NONE
+highlight! TabLineSel   guifg=#abb2bf guibg=#1c1f24 gui=bold cterm=bold
+highlight! VertSplit    guifg=#1c1f24 guibg=#1c1f24 gui=NONE cterm=NONE
+highlight! Cursor       guifg=NONE    guibg=#c7c7c7 gui=NONE cterm=NONE
+highlight! CursorLine   guifg=NONE    guibg=#2e333f gui=NONE cterm=NONE
+highlight! CursorLineNr guifg=#abb2bf guibg=#2e333f gui=NONE cterm=NONE
+highlight! LineNr       guifg=#495060 guibg=NONE    gui=NONE cterm=NONE
+highlight! SignColumn   guifg=NONE    guibg=#282c34 gui=NONE cterm=NONE
+highlight! link ColorColumn CursorLine
+highlight! FoldColumn                 guibg=NONE
+highlight! NonText      guifg=#3c404a guibg=NONE    gui=NONE cterm=NONE
+highlight! link SpecialKey NonText
+highlight! EndOfBuffer  guifg=#282c34 guibg=NONE    gui=NONE cterm=NONE
+highlight! TrailingWhitespace guifg=#e06c75 guibg=#e06c75 gui=NONE cterm=NONE
+autocmd BufWinEnter * match TrailingWhitespace /\s\+$/
+autocmd InsertEnter * match TrailingWhitespace /\s\+\%#\@<!$/
+autocmd InsertLeave * match TrailingWhitespace /\s\+$/
+
+" prettier
+nnoremap <leader><leader>p :Prettier<CR>
+
+" ale
+let g:ale_linters = {'ruby': ['standardrb']}
+let g:ale_fixers = {'ruby': ['standardrb']}
+let g:ruby_indent_assignment_style = 'variable'
+
+nnoremap <leader><leader>a :ALEFix<CR>
