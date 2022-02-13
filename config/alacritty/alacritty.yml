@@ -1,0 +1,35 @@
+import:
+  - ~/.config/alacritty/colors/onedark-hv.yml
+
+window:
+  padding:
+    x: 10
+    y: 10
+  dynamic_padding: true
+  decorations: buttonless
+
+font:
+  normal:
+    family: Hack
+    style: Regular
+  bold:
+    family: Hack
+    style: Bold
+  italic:
+    family: Hack
+    style: Italic
+  bold_italic:
+    family: Hack
+    style: Bold Italic
+  size: 16.0
+
+selection:
+  save_to_clipboard: true
+
+shell:
+  program: /opt/homebrew/bin/fish
+  args:
+    - --login
+
+key_bindings:
+  - { key: N, mods: Command, action: CreateNewWindow }

@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+set -e
+set -x
+
+# === Copy dotfiles
+
 dotfiles_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" >/dev/null && pwd)"
 
 if ! [[ -d ~/.config ]]; then
@@ -15,15 +20,23 @@ echo
 if [[ -e ~/.config/fish ]]; then
   print_warning "Fish"
 else
-  ln -s $dotfiles_dir/fish/ ~/.config/fish
+  ln -s $dotfiles_dir/config/fish/ ~/.config/fish
   print_success "Fish"
+fi
+
+# Alacritty
+if [[ -e ~/.config/alacritty ]]; then
+  print_warning "Alacritty"
+else
+  ln -s $dotfiles_dir/config/alacritty/ ~/.config/alacritty
+  print_success "Alacritty"
 fi
 
 # Git
 if [[ -e ~/.config/git ]]; then
   print_warning "Git"
 else
-  ln -s $dotfiles_dir/git/ ~/.config/git
+  ln -s $dotfiles_dir/config/git/ ~/.config/git
   print_success "Git"
 fi
 
@@ -31,7 +44,7 @@ fi
 if [[ -e ~/.config/nvim ]]; then
   print_warning "NeoVim"
 else
-  ln -s $dotfiles_dir/nvim/ ~/.config/nvim
+  ln -s $dotfiles_dir/config/nvim/ ~/.config/nvim
   print_success "NeoVim"
 fi
 
@@ -52,4 +65,39 @@ else
 fi
 
 echo
-echo "  🚀 Coding time!"
+echo "✅ Dotfiles installed."
+
+
+
+# === Install Alacritty 
+
+TMP_INSTALL_DIR=dotfiles_install
+
+cd $TMPDIR
+mkdir $TMP_INSTALL_DIR
+cd $TMP_INSTALL_DIR
+
+alacritty_version=v0.11.0
+alacritty_url="https://github.com/alacritty/alacritty/releases/download/$alacritty_version"
+
+curl -L -O "$alacritty_url/Alacritty-$alacritty_version.dmg"
+
+hdiutil attach Alacritty-$alacritty_version.dmg
+
+cp -R /Volumes/Alacritty/Alacritty.app ~/Applications
+
+hdiutil detach /Volumes/Alacritty
+
+curl -L -O "$alacritty_url/alacritty.info"
+sudo tic -xe alacritty,alacritty-direct alacritty.info
+
+infocmp alacritty
+
+curl -L -O "$alacritty_url/alacritty.fish"
+cp alacritty.fish $fish_complete_path[1]
+
+CURRENT_DIR=$(pwd)
+cd $dotfiles_dir
+rm -rf $CURRENT_DIR
+
+echo "✅ Alacritty installed."
