@@ -17,6 +17,7 @@ macOS set-up checklist
 [ ] - brew install git
 [ ] - brew install diff-so-fancy
 [ ] - brew install lazygit
+[ ] - brew install lazydocker
 [ ] - brew install neovim
 [ ] - brew install fzf
 [ ] - brew install ripgrep

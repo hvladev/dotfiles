@@ -7,12 +7,12 @@
 --| Keymaps                  load_keymaps
 --|
 --| Plugin configurations    config_lsp
+--|                          config_mason
 --|                          config_null_ls
 --|                          config_treesitter
 --|                          config_devicons
 --|                          config_lualine
 --|                          config_bufferline
---|                          config_which_key
 --|                          config_nvim_tree
 --|                          config_telescope
 --|                          config_comment
@@ -21,7 +21,8 @@
 --|                          config_gitsigns
 --|                          config_cmp
 --|
---| Plugin manager           load_plugins
+--| Plugin manager           bootstrap_plugin_manager
+--|                          load_plugins
 --|
 --| Commands                 insert_timestamp
 --|                          set_advent_of_code_mappings
@@ -56,9 +57,9 @@ local function load_options()
   opt.number = true
   opt.pumheight = 10
   opt.relativenumber = true
-  opt.scrolloff = 4
+  opt.scrolloff = 8
   opt.showmode = false
-  opt.showtabline = 2
+  opt.showtabline = 1
   opt.signcolumn = "yes"
   opt.syntax = "ON"
   opt.termguicolors = true
@@ -85,6 +86,7 @@ local function load_options()
   opt.undoreload = 10000
 
   -- [[ Misc ]]
+  opt.breakindent = true
   opt.clipboard = "unnamedplus"
   opt.linebreak = true
   opt.mouse = "a"
@@ -132,6 +134,21 @@ local function load_keymaps()
   keymap("i", "jk", "<Esc>", opts)
   keymap("c", "jk", "<C-c>", opts)
 
+  -- Quit window
+  keymap("n", "<leader>q", "<cmd>quit<cr>", opts)
+
+  -- Suspend editor
+  keymap("n", "<leader>m", "<C-z>", opts)
+
+  -- Save file
+  keymap("n", "<leader>s", "<cmd>update<cr>", opts)
+
+  -- Clear search highlights
+  keymap("n", "<leader>c", "<cmd>nohlsearch<cr>", opts)
+
+  -- Switch to alternate buffer
+  keymap("n", "<leader><tab>", "<C-^>", opts)
+
   -- Use j and k to navigate between wrapped lines too
   keymap("v", "j", "gj", opts)
   keymap("v", "k", "gk", opts)
@@ -143,6 +160,9 @@ local function load_keymaps()
   keymap("n", "L", "$", opts)
   keymap("x", "H", "^", opts)
   keymap("x", "L", "$", opts)
+
+  -- Make Y behave like other capitals
+  keymap("n", "Y", "y$", opts)
 
   -- Moving lines
   keymap("x", "<C-j>", ":move'>+<CR>gv", opts)
@@ -166,51 +186,25 @@ local function load_keymaps()
   keymap("n", "<A-Left>", ":vertical resize -2<CR>", opts)
   keymap("n", "<A-Right>", ":vertical resize +2<CR>", opts)
 
-  -- Make Y behave like other capitals
-  keymap("n", "Y", "y$", opts)
+  -- Go to tab
+  keymap("n", "<leader>0", "<cmd>:tablast<cr>", opts)
+  keymap("n", "<leader>1", "1gt", opts)
+  keymap("n", "<leader>2", "2gt", opts)
+  keymap("n", "<leader>3", "3gt", opts)
+  keymap("n", "<leader>4", "4gt", opts)
+  keymap("n", "<leader>5", "5gt", opts)
+  keymap("n", "<leader>6", "6gt", opts)
+  keymap("n", "<leader>7", "7gt", opts)
+  keymap("n", "<leader>8", "8gt", opts)
+  keymap("n", "<leader>9", "9gt", opts)
 
-  require("which-key").register({
-    q = { "<cmd>quit<cr>", "Quit window" },
-    m = { "<C-z>", "Suspend editor" },
-    s = { "<cmd>update<cr>", "Save file" },
-    c = { "<cmd>nohlsearch<cr>", "Clear search highlights" },
-    ["<tab>"] = { "<C-^>", "Switch to alternate buffer" },
+  -- Go to previous/next tab
+  keymap("n", "<leader>]", "gt", opts)
+  keymap("n", "<leader>[", "gT", opts)
 
-    ["|"] = { "<cmd>vsplit<cr>", "Split right" },
-    ["-"] = { "<cmd>split<cr>", "Split below" },
-
-    ["0"] = { "<cmd>:tablast<cr>", "Go to last tab" },
-    ["1"] = { "1gt", "Go to tab 1" },
-    ["2"] = { "2gt", "Go to tab 2" },
-    ["3"] = { "3gt", "Go to tab 3" },
-    ["4"] = { "4gt", "Go to tab 4" },
-    ["5"] = { "5gt", "Go to tab 5" },
-    ["6"] = { "6gt", "Go to tab 6" },
-    ["7"] = { "7gt", "Go to tab 7" },
-    ["8"] = { "8gt", "Go to tab 8" },
-    ["9"] = { "9gt", "Go to tab 9" },
-
-    ["]"] = { "gt", "Go to next tab" },
-    ["["] = { "gT", "Go to previous tab" },
-
-    ["}"] = { "<cmd>tabmove+<cr>", "Move tab to the right" },
-    ["{"] = { "<cmd>tabmove-<cr>", "Move tab to the left" },
-
-    [","] = {
-      name = "[ SYSTEM ]",
-
-      r = { "<cmd>source $MYVIMRC<cr>", "Reload config" },
-      [","] = { "<cmd>tabnew $MYVIMRC<cr>", "Open config" },
-
-      p = {
-        name = "[ PLUGINS ]",
-
-        s = { "<cmd>PackerStatus<cr>", "Status" },
-        u = { "<cmd>PackerSync<cr>", "Sync" },
-        c = { "<cmd>PackerCompile<cr>", "Compile" },
-      },
-    }
-  }, { prefix = "<leader>", mode = "n" })
+  -- Move tab to the left/right
+  keymap("n", "<leader>}", "<cmd>tabmove+<cr>", opts)
+  keymap("n", "<leader>{", "<cmd>tabmove-<cr>", opts)
 end
 
 --------------------------------------------------------------------------------
@@ -221,64 +215,67 @@ end
 --|=============================================================================
 --------------------------------------------------------------------------------
 
+local function config_mason()
+  require("mason").setup()
+end
+
 local function config_lsp()
-  require("nvim-lsp-installer").setup({
-    automatic_installation = true,
+  require("neodev").setup({})
+
+  require("mason-lspconfig").setup({
+    ensure_installed = {
+      "clojure_lsp",
+      "cssls",
+      "html",
+      "jsonls",
+      "solargraph",
+      "sumneko_lua",
+      "svelte",
+      "tailwindcss",
+      "tsserver",
+    },
   })
 
   local lspconfig = require("lspconfig")
 
+  -- Mappings
+  local opts = { noremap = true, silent = true }
+
+  vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
+  vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
+  vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
+  vim.keymap.set("n", "<leader>d", vim.diagnostic.setloclist, opts)
+
+  -- Use an on_attach function to only map the following keys
+  -- after the language server attaches to the current buffer
   local on_attach = function(client, bufnr)
-    if client.name == "tsserver" or client.name == "solargraph" then
-      client.server_capabilities.documentFormattingProvider = false
-    end
+    -- Mappings.
+    local bufopts = { noremap = true, silent = true, buffer = bufnr }
 
-    local opts = { buffer = bufnr }
+    vim.keymap.set("n", "gd", vim.lsp.buf.definition, bufopts)
+    vim.keymap.set("n", "gD", vim.lsp.buf.declaration, bufopts)
+    vim.keymap.set("n", "gi", vim.lsp.buf.implementation, bufopts)
+    vim.keymap.set("n", "gr", vim.lsp.buf.references, bufopts)
 
-    vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-    vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
-    vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts)
-    vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
+    vim.keymap.set("n", "K", vim.lsp.buf.hover, bufopts)
+    vim.keymap.set("n", "S", vim.lsp.buf.signature_help, bufopts)
 
-    vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-    vim.keymap.set("n", "S", vim.lsp.buf.signature_help, opts)
+    vim.keymap.set("n", "<leader>la", vim.lsp.buf.code_action, bufopts)
+    vim.keymap.set("n", "<leader>ld", vim.lsp.buf.type_definition, bufopts)
+    vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, bufopts)
+    vim.keymap.set("n", "<leader>lf", vim.lsp.buf.format, bufopts)
+    vim.keymap.set("n", "<leader>ls", require("telescope.builtin").lsp_document_symbols, bufopts)
 
-    require("which-key").register({
-      name = "[ LSP ]",
-
-      a = { vim.lsp.buf.code_action, "Code action", buffer = bufnr },
-      d = { vim.lsp.buf.type_definition, "Type definition", buffer = bufnr },
-      r = { vim.lsp.buf.rename, "Rename", buffer = bufnr },
-      f = { vim.lsp.buf.format, "Format", buffer = bufnr },
-      s = {
-        require("telescope.builtin").lsp_document_symbols,
-        "Symbols",
-        buffer = bufnr,
-      },
-
-      w = {
-        name = "[ WORKSPACE FOLDERS ]",
-        a = {
-          vim.lsp.buf.add_workspace_folder,
-          "Add workspace folder",
-          buffer = bufnr,
-        },
-        r = {
-          vim.lsp.buf.remove_workspace_folder,
-          "Remove workspace folder",
-          buffer = bufnr,
-        },
-        l = {
-          function() vim.inspect(vim.lsp.buf.list_workspace_folders()) end,
-          "List workspace folders",
-          buffer = bufnr,
-        },
-      },
-    }, { prefix = "<leader>l", mode = "n" })
+    vim.keymap.set("n", "<leader>wa", vim.lsp.buf.add_workspace_folder, bufopts)
+    vim.keymap.set("n", "<leader>wr", vim.lsp.buf.remove_workspace_folder, bufopts)
+    vim.keymap.set("n", "<leader>wl", function()
+      print(vim.inspect(vim.lsp.buf.list_workspace_folders()))
+    end, bufopts)
   end
 
-  local capabilities = vim.lsp.protocol.make_client_capabilities()
-  capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
+  -- local capabilities = vim.lsp.protocol.make_client_capabilities()
+  -- capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
+  local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
   local servers = {
     clojure_lsp = {},
@@ -303,35 +300,12 @@ local function config_lsp()
       settings = {
         solargraph = {
           diagnostics = false,
+          format = false,
+          formatting = false,
         },
       },
     },
-    sumneko_lua = {
-      settings = {
-        Lua = {
-          runtime = {
-            version = "LuaJIT",
-            path = (function()
-              local runtime_path = vim.split(package.path, ";")
-
-              table.insert(runtime_path, "lua/?.lua")
-              table.insert(runtime_path, "lua/?/init.lua")
-
-              return runtime_path
-            end)(),
-          },
-          diagnostics = {
-            globals = { "vim" },
-          },
-          workspace = {
-            library = vim.api.nvim_get_runtime_file("", true),
-          },
-          telemetry = {
-            enable = false,
-          },
-        },
-      },
-    },
+    sumneko_lua = {},
   }
 
   for server_name, custom_config in pairs(servers) do
@@ -373,6 +347,7 @@ local function config_treesitter()
 
     highlight = {
       enable = true,
+      disable = { "embedded_template" },
     },
 
     indent = {
@@ -399,6 +374,18 @@ local function config_treesitter()
           ["if"] = "@function.inner",
           ["ac"] = "@class.outer",
           ["ic"] = "@class.inner",
+          ["ar"] = "@block.outer",
+          ["ir"] = "@block.inner",
+        },
+      },
+
+      swap = {
+        enable = true,
+        swap_next = {
+          ["<leader>a"] = "@parameter.inner",
+        },
+        swap_previous = {
+          ["<leader>A"] = "@parameter.inner",
         },
       },
 
@@ -427,6 +414,10 @@ local function config_treesitter()
     matchup = {
       enable = true,
     },
+
+    endwise = {
+      enable = true
+    },
   })
 end
 
@@ -443,107 +434,193 @@ local function config_devicons()
 end
 
 local function config_lualine()
-  local colors = {
-    blue   = "#61afef",
-    green  = "#98c379",
-    purple = "#c678dd",
-    cyan   = "#56b6c2",
-    red1   = "#e06c75",
-    red2   = "#be5046",
-    yellow = "#e5c07b",
-    fg     = "#abb2bf",
-    bg     = "#181a1f",
-    gray1  = "#828997",
-    gray2  = "#2c323c",
-    gray3  = "#3e4452",
-  }
-
-  local onedark_hv = {
-    normal = {
-      a = { fg = colors.fg, bg = colors.bg },
-      b = { fg = colors.fg, bg = colors.bg },
-      c = { fg = colors.fg, bg = colors.bg },
-
-      x = { fg = colors.fg, bg = colors.bg },
-      y = { fg = colors.fg, bg = colors.bg },
-      z = { fg = colors.fg, bg = colors.bg },
-    },
-    inactive = {
-      a = { fg = colors.gray1, bg = colors.bg },
-      b = { fg = colors.gray1, bg = colors.bg },
-      c = { fg = colors.gray1, bg = colors.bg },
-    },
-  }
-
   require("lualine").setup({
     options = {
-      icons_enabled = true,
-      theme = onedark_hv,
-      component_separators = { left = nil, right = nil },
-      section_separators = { left = "·", right = "·" },
-      disabled_filetypes = {},
-      always_divide_middle = false,
-      globalstatus = false,
+      theme = "onedark",
+      globalstatus = true,
     },
-    sections = {
-      lualine_a = { "filename" },
-      lualine_b = {},
-      lualine_c = {},
-      lualine_x = {
-        { "fileformat", symbols = { unix = "LF", dos = "CRLF", mac = "CR" } },
-        "encoding",
-        "filetype",
-        "%l:%c"
+    winbar = {
+      lualine_a = {},
+      lualine_b = {
+        { "diagnostics" },
       },
-      lualine_y = {},
-      lualine_z = {}
-    },
-    inactive_sections = {
-      lualine_a = { "filename" },
-      lualine_b = {},
-      lualine_c = {},
+      lualine_c = {
+        { "filetype", icon_only = true, separator = "" },
+        { "filename", padding = { padding_left = 0 } },
+      },
       lualine_x = {},
       lualine_y = {},
       lualine_z = {}
     },
-    tabline = {},
-    extensions = { "nvim-tree" }
-  })
-end
-
-local function config_bufferline()
-  require("bufferline").setup({
-    options = {
-      mode = "tabs",
-    }
-  })
-end
-
-local function config_which_key()
-  require("which-key").setup({
-    plugins = {
-      spelling = {
-        enabled = true,
+    inactive_winbar = {
+      lualine_a = {},
+      lualine_b = {
+        "diagnostics",
       },
+      lualine_c = {
+        { "filetype", icon_only = true, separator = "" },
+        { "filename", padding = { padding_left = 0 } },
+      },
+      lualine_x = {},
+      lualine_y = {},
+      lualine_z = {}
     },
-    window = {
-      border = "none", -- none, single, double, shadow
-      position = "bottom", -- bottom, top
-      margin = { 0, 0, 0, 0 }, -- extra window margin [top, right, bottom, left]
-      padding = { 2, 2, 2, 2 }, -- extra window padding [top, right, bottom, left]
-      winblend = 0
-    },
-    layout = {
-      align = "center",
-    },
-    icons = {
-      group = "",
-    },
-    ignore_missing = true,
   })
+
+  -- local colors = {
+  --   blue   = "#61afef",
+  --   green  = "#98c379",
+  --   purple = "#c678dd",
+  --   cyan   = "#56b6c2",
+  --   red1   = "#e06c75",
+  --   red2   = "#be5046",
+  --   yellow = "#e5c07b",
+  --   fg     = "#abb2bf",
+  --   bg     = "#181a1f",
+  --   gray1  = "#828997",
+  --   gray2  = "#2c323c",
+  --   gray3  = "#3e4452",
+  -- }
+  --
+  -- local onedark_hv = {
+  --   normal = {
+  --     a = { fg = colors.fg, bg = colors.bg },
+  --     b = { fg = colors.fg, bg = colors.bg },
+  --     c = { fg = colors.fg, bg = colors.bg },
+  --
+  --     x = { fg = colors.fg, bg = colors.bg },
+  --     y = { fg = colors.fg, bg = colors.bg },
+  --     z = { fg = colors.fg, bg = colors.bg },
+  --   },
+  --   inactive = {
+  --     a = { fg = colors.gray1, bg = colors.bg },
+  --     b = { fg = colors.gray1, bg = colors.bg },
+  --     c = { fg = colors.gray1, bg = colors.bg },
+  --   },
+  -- }
+  --
+  -- require("lualine").setup({
+  --   options = {
+  --     icons_enabled = true,
+  --     theme = onedark_hv,
+  --     component_separators = { left = nil, right = nil },
+  --     section_separators = { left = "·", right = "·" },
+  --     disabled_filetypes = {},
+  --     always_divide_middle = false,
+  --     globalstatus = false,
+  --   },
+  --   sections = {
+  --     lualine_a = { "filename" },
+  --     lualine_b = {},
+  --     lualine_c = {},
+  --     lualine_x = {
+  --       { "fileformat", symbols = { unix = "LF", dos = "CRLF", mac = "CR" } },
+  --       "encoding",
+  --       "filetype",
+  --       "%l:%c"
+  --     },
+  --     lualine_y = {},
+  --     lualine_z = {}
+  --   },
+  --   inactive_sections = {
+  --     lualine_a = { "filename" },
+  --     lualine_b = {},
+  --     lualine_c = {},
+  --     lualine_x = {},
+  --     lualine_y = {},
+  --     lualine_z = {}
+  --   },
+  --   tabline = {},
+  --   extensions = { "nvim-tree" }
+  -- })
 end
+
+-- vim.cmd([[
+--   let s:statusLineSeparator = ' · '
+--
+--   function! MyStatusLineFileEOL()
+--     let l:eol = get({'dos': 'CRLF', 'unix': 'LF', 'mac': 'CR'}, &fileformat, '')
+--
+--     return empty(l:eol) ? '' : l:eol . s:statusLineSeparator
+--   endfunction
+--
+--   function! MyStatusLineFileEncoding()
+--     return toupper(empty(&fileencoding) ? &encoding : &fileencoding) . s:statusLineSeparator
+--   endfunction
+--
+--   function! MyStatusLineFiletype()
+--     return empty(&filetype) ? '' : &filetype . s:statusLineSeparator
+--   endfunction
+--
+--   function! MyStatusLine()
+--     return ' %{get(b:,"gitsigns_head","")}' .
+--          \ s:statusLineSeparator .
+--          \ '%f %m%r ' .
+--          \ '%=%<' .
+--          \ '%{MyStatusLineFileEOL()}' .
+--          \ '%{MyStatusLineFileEncoding()}' .
+--          \ '%{MyStatusLineFiletype()}' .
+--          \ '%l:%c '
+--   endfunction
+--
+--   set statusline=%!MyStatusLine()
+--
+--
+--   function! MyTabLine()
+--     let s = ''
+--     for i in range(1, tabpagenr('$'))
+--       " select the highlighting
+--       if i == tabpagenr()
+--         let s .= '%#TabLineSel#'
+--       else
+--         let s .= '%#TabLine#'
+--       endif
+--
+--       " set the tab page number (for mouse clicks)
+--       let s .= '%' . i . 'T'
+--
+--       " the label is made by MyTabLabel()
+--       if i == tabpagenr()
+--         let s .= ' [ ' . i . ' ] %{MyTabLabel(' . i . ')}  '
+--       else
+--         let s .= ' [ ' . i . ' ] %{MyTabLabel(' . i . ')}  '
+--       endif
+--     endfor
+--
+--     " after the last tab fill with TabLineFill and reset tab page nr
+--     let s .= '%#TabLineFill#%T'
+--
+--     " right-align the label to close the current tab page
+--     if tabpagenr('$') > 1
+--       let s .= '%=%#TabLine#%999X✕%X '
+--     endif
+--
+--     return s
+--   endfunction
+--
+--   function! MyTabLabel(n)
+--     let buflist = tabpagebuflist(a:n)
+--     let winnr = tabpagewinnr(a:n)
+--     let label = expand('#' . buflist[winnr - 1] . ':t')
+--
+--     return empty(label) ? 'Untitled' : label
+--   endfunction
+--
+--   set tabline=%!MyTabLine()
+-- ]])
+
+-- local function config_bufferline()
+--   require("bufferline").setup({
+--     options = {
+--       mode = "tabs",
+--     }
+--   })
+-- end
 
 local function config_nvim_tree()
+  vim.g.loaded_netrw = 1
+  vim.g.loaded_netrwPlugin = 1
+
   require("nvim-tree").setup({
     hijack_cursor = true,
     view = {
@@ -572,10 +649,11 @@ local function config_nvim_tree()
     },
   })
 
-  require("which-key").register({
-    e = { "<cmd>NvimTreeFindFileToggle<cr>", "Toggle file explorer (file)" },
-    E = { "<cmd>NvimTreeToggle<cr>", "Toggle file explorer (root)" },
-  }, { prefix = "<leader>", mode = "n" })
+  local opts = { silent = true }
+  -- Toggle file explorer (file)
+  vim.keymap.set("n", "<leader>e", "<cmd>NvimTreeFindFileToggle<cr>", opts)
+  -- Toggle file explorer (root)
+  vim.keymap.set("n", "<leader>E", "<cmd>NvimTreeToggle<cr>", opts)
 end
 
 local function config_telescope()
@@ -599,13 +677,11 @@ local function config_telescope()
   telescope.load_extension("fzf")
 
   local builtin = require("telescope.builtin")
-
-  require("which-key").register({
-    j = { builtin.find_files, "Find files" },
-    k = { builtin.buffers, "Find buffers" },
-    ["/"] = { builtin.live_grep, "Find text" },
-    ["?"] = { builtin.grep_string, "Find text under cursor" },
-  }, { prefix = "<leader>", mode = "n" })
+  local opts = { silent = true }
+  vim.keymap.set("n", "<leader>j", builtin.find_files, opts)
+  vim.keymap.set("n", "<leader>k", builtin.buffers, opts)
+  vim.keymap.set("n", "<leader>/", builtin.live_grep, opts)
+  vim.keymap.set("n", "<leader>?", builtin.grep_string, opts)
 end
 
 local function config_comment()
@@ -641,10 +717,10 @@ local function config_gitsigns()
 end
 
 local function config_cmp()
+  local luasnip = require("luasnip")
   local cmp = require("cmp")
 
   require("luasnip.loaders.from_vscode").lazy_load()
-  local luasnip = require("luasnip")
   luasnip.filetype_extend("ruby", { "rails" })
   luasnip.filetype_extend("javascriptreact", { "html" })
   luasnip.filetype_extend("typescriptreact", { "html" })
@@ -677,6 +753,12 @@ local function config_cmp()
     TypeParameter = "",
   }
 
+  local has_words_before = function()
+    unpack = unpack or table.unpack
+    local line, col = unpack(vim.api.nvim_win_get_cursor(0))
+    return col ~= 0 and vim.api.nvim_buf_get_lines(0, line - 1, line, true)[1]:sub(col, col):match("%s") == nil
+  end
+
   cmp.setup({
     formatting = {
       format = function(entry, vim_item)
@@ -707,8 +789,8 @@ local function config_cmp()
       documentation = cmp.config.window.bordered(),
     },
     mapping = cmp.mapping.preset.insert({
-      ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-      ["<C-f>"] = cmp.mapping.scroll_docs(4),
+      ["<C-u>"] = cmp.mapping.scroll_docs(-4), -- Up
+      ["<C-d>"] = cmp.mapping.scroll_docs(4), -- Down
       ["<C-n>"] = cmp.mapping.complete({}),
       ["<C-e>"] = cmp.mapping.abort(),
       -- Accept currently selected item. Set `select` to `false` to only
@@ -719,6 +801,8 @@ local function config_cmp()
           cmp.select_next_item()
         elseif luasnip.expand_or_jumpable() then
           luasnip.expand_or_jump()
+        elseif has_words_before() then
+          cmp.complete()
         else
           fallback()
         end
@@ -743,7 +827,16 @@ local function config_cmp()
   })
 
   cmp.setup.cmdline(":", {
-    mapping = cmp.mapping.preset.cmdline(),
+    mapping = cmp.mapping.preset.cmdline({
+      ["<C-p>"] = cmp.mapping(
+        cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Select }),
+        {"c"}
+      ),
+      ["<C-n>"] = cmp.mapping(
+        cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Select }),
+        {"c"}
+      ),
+    }),
     sources = cmp.config.sources({
       { name = "path" }
     }, {
@@ -762,168 +855,200 @@ end
 --------------------------------------------------------------------------------
 --|=============================================================================
 --|
---| PLUGIN MANAGER
---|
---|=============================================================================
---------------------------------------------------------------------------------
-
-local function load_plugins()
-  require("packer").startup({
-    {
-      { "wbthomason/packer.nvim" },
-
-      {
-        "neovim/nvim-lspconfig",
-        requires = { "williamboman/nvim-lsp-installer" },
-        config = config_lsp,
-      },
-
-      {
-        "jose-elias-alvarez/null-ls.nvim",
-        requires = { "nvim-lua/plenary.nvim" },
-        config = config_null_ls,
-      },
-
-      {
-        "nvim-treesitter/nvim-treesitter",
-        run = ":TSUpdate",
-        config = config_treesitter,
-      },
-
-      { "nvim-treesitter/nvim-treesitter-textobjects" },
-
-      {
-        "nvim-telescope/telescope.nvim",
-        requires = {
-          { "nvim-lua/plenary.nvim" },
-          { "nvim-telescope/telescope-fzf-native.nvim", run = "make" },
-        },
-        config = config_telescope,
-      },
-
-      {
-        "kyazdani42/nvim-tree.lua",
-        requires = { "kyazdani42/nvim-web-devicons", opt = true },
-        config = config_nvim_tree,
-      },
-
-      {
-        "hrsh7th/nvim-cmp",
-        requires = {
-          "hrsh7th/cmp-nvim-lsp",
-          "hrsh7th/cmp-buffer",
-          "hrsh7th/cmp-path",
-          "hrsh7th/cmp-cmdline",
-
-          "L3MON4D3/LuaSnip",
-          "rafamadriz/friendly-snippets",
-          "saadparwaiz1/cmp_luasnip",
-        },
-        config = config_cmp,
-      },
-
-      {
-        "nvim-lualine/lualine.nvim",
-        requires = { "kyazdani42/nvim-web-devicons" },
-        config = config_lualine,
-      },
-
-      {
-        "akinsho/bufferline.nvim",
-        requires = { "kyazdani42/nvim-web-devicons" },
-        tag = "v2.*",
-        config = config_bufferline,
-      },
-
-      { "tpope/vim-surround" },
-      { "tpope/vim-endwise" },
-      { "numToStr/Comment.nvim", config = config_comment },
-      { "windwp/nvim-autopairs", config = config_autopairs },
-      { "andymass/vim-matchup" },
-
-      { "tpope/vim-repeat" },
-      { "tpope/vim-eunuch" },
-
-      { "tpope/vim-fugitive" },
-      { "tpope/vim-rhubarb" },
-      { "lewis6991/gitsigns.nvim", config = config_gitsigns },
-
-      { "folke/which-key.nvim", config = config_which_key },
-      { "kyazdani42/nvim-web-devicons", config = config_devicons },
-
-      { "lukas-reineke/indent-blankline.nvim", config = config_indent_blankline },
-
-      { "tpope/vim-rails" },
-
-      { "navarasu/onedark.nvim" },
-    },
-    config = {
-      display = {
-        open_fn = function()
-          return require("packer.util").float({ border = "rounded" })
-        end,
-      },
-    },
-  })
-end
-
---------------------------------------------------------------------------------
---|=============================================================================
---|
 --| COLORSCHEME
 --|
 --|=============================================================================
 --------------------------------------------------------------------------------
 
-vim.opt.background = "dark"
+local function config_theme_onedark()
+  local mode = "dark"
 
-local onedark = require("onedark")
+  vim.opt.background = mode
 
-onedark.setup({
-  -- Main options --
-  style = "dark", -- Default theme style. Choose between "dark", "darker", "cool", "deep", "warm", "warmer" and "light"
-  transparent = false, -- Show/hide background
-  term_colors = true, -- Change terminal color as per the selected theme style
-  ending_tildes = false, -- Show the end-of-buffer tildes. By default they are hidden
-  cmp_itemkind_reverse = false, -- reverse item kind highlights in cmp menu
-  -- toggle theme style ---
-  toggle_style_key = "<leader>ts", -- Default keybinding to toggle
-  toggle_style_list = { "dark", "darker", "cool", "deep", "warm", "warmer", "light" }, -- List of styles to toggle between
+  local onedark = require("onedark")
 
-  -- Change code style ---
-  -- Options are italic, bold, underline, none
-  -- You can configure multiple style with comma seperated, For e.g., keywords = "italic,bold"
-  code_style = {
-    comments = "italic",
-    keywords = "none",
-    functions = "none",
-    strings = "none",
-    variables = "none"
-  },
+  onedark.setup({
+    -- Main options --
+    style = mode, -- Default theme style. Choose between "dark", "darker", "cool", "deep", "warm", "warmer" and "light"
+    transparent = false, -- Show/hide background
+    term_colors = true, -- Change terminal color as per the selected theme style
+    ending_tildes = false, -- Show the end-of-buffer tildes. By default they are hidden
+    cmp_itemkind_reverse = false, -- reverse item kind highlights in cmp menu
+    -- toggle theme style ---
+    toggle_style_key = "<leader>ts", -- Default keybinding to toggle
+    toggle_style_list = { "dark", "darker", "cool", "deep", "warm", "warmer", "light" }, -- List of styles to toggle between
 
-  -- Custom colors & highlight groups --
-  colors = {},
-  highlights = {
-    VertSplit = { fg = "$black", bg = "$bg0" },
+    -- Change code style ---
+    -- Options are italic, bold, underline, none
+    -- You can configure multiple style with comma seperated, For e.g., keywords = "italic,bold"
+    code_style = {
+      comments = "italic",
+      keywords = "none",
+      functions = "none",
+      strings = "none",
+      variables = "none"
+    },
 
-    StatusLine = { fg = "$fg", bg = "$black" },
-    StatusLineNC = { fg = "$fg", bg = "$black" },
-    -- StatusLineTerm = {fg = "$black", bg = "$black"},
-    -- StatusLineTermNC = {fg = "$black", bg = "$black"},
-    MsgArea = { fg = "$fg", bg = "$bg0" },
+    -- Custom colors & highlight groups --
+    colors = {},
+    highlights = {
+      VertSplit = { fg = "$black", bg = "$bg0" },
 
-    WhichKeyFloat = { bg = "$black" },
-  },
+      StatusLine = { fg = "$fg", bg = "$black" },
+      StatusLineNC = { fg = "#495060", bg = "$black" },
+      -- StatusLineTerm = {fg = "$black", bg = "$black"},
+      -- StatusLineTermNC = {fg = "$black", bg = "$black"},
+      TabLine = { fg = "#495060", bg = "$black" },
+      TabLineFill = { fg = "NONE", bg = "$black" },
+      TabLineSel = { fg = "#abb2bf", bg = "$black" },
+      MsgArea = { fg = "$fg", bg = "$bg0" },
 
-  -- Plugins Config --
-  diagnostics = {
-    darker = true, -- darker colors for diagnostic
-    undercurl = true, -- use undercurl instead of underline for diagnostics
-    background = true, -- use background color for virtual text
-  },
-})
+      WhichKeyFloat = { bg = "$black" },
+    },
 
-onedark.load()
+    -- Plugins Config --
+    diagnostics = {
+      darker = true, -- darker colors for diagnostic
+      undercurl = true, -- use undercurl instead of underline for diagnostics
+      background = true, -- use background color for virtual text
+    },
+  })
+
+  onedark.load()
+end
+
+--------------------------------------------------------------------------------
+--|=============================================================================
+--|
+--| PLUGIN MANAGER
+--|
+--|=============================================================================
+--------------------------------------------------------------------------------
+
+local function bootstrap_plugin_manager()
+  local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+  if not vim.loop.fs_stat(lazypath) then
+    vim.fn.system({
+      "git",
+      "clone",
+      "--filter=blob:none",
+      "https://github.com/folke/lazy.nvim.git",
+      "--branch=stable", -- latest stable release
+      lazypath,
+    })
+  end
+  vim.opt.rtp:prepend(lazypath)
+end
+
+local function load_plugins()
+  require("lazy").setup({
+    -- General typing/editing
+    "RRethy/nvim-treesitter-endwise",
+    "andymass/vim-matchup",
+    "tpope/vim-repeat",
+    "tpope/vim-surround",
+    { "numToStr/Comment.nvim", config = config_comment },
+    { "windwp/nvim-autopairs", config = config_autopairs },
+
+    -- Syntax & highlighting
+    {
+      "nvim-treesitter/nvim-treesitter",
+      build = ":TSUpdate",
+      config = config_treesitter,
+    },
+    "nvim-treesitter/nvim-treesitter-textobjects",
+
+    -- LSP
+    { "williamboman/mason.nvim", priority = 100, config = config_mason },
+    { "williamboman/mason-lspconfig.nvim", priority = 99 },
+    { "neovim/nvim-lspconfig", priority = 98, config = config_lsp },
+    {
+      "jose-elias-alvarez/null-ls.nvim",
+      dependencies = { "nvim-lua/plenary.nvim" },
+      config = config_null_ls,
+    },
+    "folke/neodev.nvim",
+
+    -- Fuzyy Finder
+    {
+      "nvim-telescope/telescope.nvim",
+      dependencies = {
+        { "nvim-lua/plenary.nvim" },
+        { "nvim-telescope/telescope-fzf-native.nvim", build = "make" },
+      },
+      config = config_telescope,
+    },
+
+    -- Completion
+    "hrsh7th/cmp-nvim-lsp",
+    "hrsh7th/cmp-buffer",
+    "hrsh7th/cmp-cmdline",
+    "hrsh7th/cmp-path",
+    { "hrsh7th/nvim-cmp", config = config_cmp },
+
+    -- Snippets
+    "L3MON4D3/LuaSnip",
+    "rafamadriz/friendly-snippets",
+    "saadparwaiz1/cmp_luasnip",
+
+    -- Git / GitHub
+    "tpope/vim-fugitive",
+    "tpope/vim-rhubarb",
+    { "lewis6991/gitsigns.nvim", config = config_gitsigns },
+
+    -- Ruby
+    "tpope/vim-rails",
+
+    -- UI
+    { "kyazdani42/nvim-web-devicons", config = config_devicons },
+    { "lukas-reineke/indent-blankline.nvim", config = config_indent_blankline },
+    {
+      "kyazdani42/nvim-tree.lua",
+      dependencies = { "kyazdani42/nvim-web-devicons" },
+      config = config_nvim_tree,
+    },
+    {
+      "nvim-lualine/lualine.nvim",
+      requires = { "kyazdani42/nvim-web-devicons" },
+      config = config_lualine,
+    },
+
+    -- Themes
+    {
+      "navarasu/onedark.nvim",
+      lazy = false,
+      priority = 1000,
+      config = config_theme_onedark,
+    },
+
+    -- Misc
+    "tpope/vim-eunuch",
+    "pbrisbin/vim-mkdir",
+  })
+end
+
+--
+-- local function load_plugins()
+--   require("packer").startup({
+--     {
+--       { "wbthomason/packer.nvim" },
+--
+--       {
+--         "akinsho/bufferline.nvim",
+--         requires = { "kyazdani42/nvim-web-devicons" },
+--         tag = "v2.*",
+--         config = config_bufferline,
+--       },
+--     },
+--     config = {
+--       display = {
+--         open_fn = function()
+--           return require("packer.util").float({ border = "rounded" })
+--         end,
+--       },
+--     },
+--   })
+-- end
 
 --------------------------------------------------------------------------------
 --|=============================================================================
@@ -1032,6 +1157,7 @@ local function load_config()
   load_keymaps()
   load_commands()
   load_misc()
+  bootstrap_plugin_manager()
   load_plugins()
 end
 
