@@ -1,5 +1,8 @@
+# Terminal
+# set -x TERM xterm-kitty
+
 # Homebrew
-fish_add_path --global /opt/homebrew/bin
+fish_add_path --global $(brew --prefix)
 
 # Locale variables
 set -x LC_ALL en_US.UTF-8

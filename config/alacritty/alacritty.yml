@@ -7,21 +7,30 @@ window:
     y: 10
   dynamic_padding: true
   decorations: buttonless
+  dimensions:
+    columns: 90
+    lines: 24
 
 font:
   normal:
-    family: Hack Nerd Font
+    family: Hack
     style: Regular
   bold:
-    family: Hack Nerd Font
-    style: Bold
+    family: Hack
+    style: Regular
   italic:
-    family: Hack Nerd Font
+    family: Hack
     style: Italic
   bold_italic:
-    family: Hack Nerd Font
+    family: Hack
     style: Bold Italic
-  size: 16.0
+  size: 15.0
+  offset:
+    x: 0
+    y: 10
+  glyph_offset:
+    x: 0
+    y: 5
 
 selection:
   save_to_clipboard: true
