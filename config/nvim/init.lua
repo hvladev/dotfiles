@@ -9,10 +9,13 @@ require('hv.plugins.lazy').setup({
   require('hv.plugins.lsp'),
   require('hv.plugins.autocompletion'),
   require('hv.plugins.indent_blankline'),
+  require('hv.plugins.oil'),
 
+  'github/copilot.vim',
+  'tpope/vim-eunuch',
+  'tpope/vim-rails',
   'tpope/vim-sleuth',
-  { 'numToStr/Comment.nvim', opts = {} },
-
-  -- Plugins to explore:
-  -- https://github.com/stevearc/oil.nvim
+  'nvim-tree/nvim-web-devicons',
+  { 'numToStr/Comment.nvim',  opts = {} },
+  { 'kylechui/nvim-surround', version = '*', opts = {} },
 })
