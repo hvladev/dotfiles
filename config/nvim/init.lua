@@ -10,8 +10,8 @@ require('hv.plugins.lazy').setup({
   require('hv.plugins.autocompletion'),
   require('hv.plugins.indent_blankline'),
   require('hv.plugins.oil'),
+  require('hv.plugins.copilot'),
 
-  'github/copilot.vim',
   'tpope/vim-eunuch',
   'tpope/vim-rails',
   'tpope/vim-sleuth',
