@@ -1,9 +1,12 @@
 return {
-  "github/copilot.vim",
+  'github/copilot.vim',
   config = function()
-    vim.cmd([[
-      imap <silent><script><expr> <C-J> copilot#Accept("\<CR>")
-      let g:copilot_no_tab_map = v:true
-    ]])
+    vim.g.copilot_no_tab_map = true
+    vim.g.copilot_assume_mapped = true
+
+    vim.api.nvim_set_keymap('i', '<C-l>', 'copilot#Accept("<CR>")', {
+      silent = true,
+      expr = true,
+    })
   end
 }

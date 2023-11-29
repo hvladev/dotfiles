@@ -19,6 +19,8 @@ return {
     local servers = {
       'jsonls',
       'lua_ls',
+      'ruby_ls',
+      'standardrb',
       'tailwindcss',
       'tsserver',
     }
