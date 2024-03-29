@@ -1,6 +1,6 @@
 -- https://github.com/nvim-treesitter/nvim-treesitter
 
-return   {
+return {
   'nvim-treesitter/nvim-treesitter',
   dependencies = {
     'nvim-treesitter/nvim-treesitter-textobjects',
@@ -14,6 +14,7 @@ return   {
 
         -- Add languages to be installed here that you want installed for treesitter
         ensure_installed = {
+          'astro',
           'bash',
           'c',
           'cpp',
@@ -90,6 +91,10 @@ return   {
               ['<leader>A'] = '@parameter.inner',
             },
           },
+        },
+
+        matchup = {
+          enable = true,
         },
       })
     end, 0)

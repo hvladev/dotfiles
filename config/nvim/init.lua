@@ -21,14 +21,8 @@ require('hv.plugins.lazy').setup({
   { 'kylechui/nvim-surround', version = '*', opts = {} },
 
   -- TODO: testing
-  {
-    'vim-test/vim-test',
-    config = function()
-      vim.keymap.set('n', '<CR>', ':TestNearest<CR>', { desc = '[T]est [N]earest' })
-      vim.keymap.set('n', '<leader>tf', ':TestFile<CR>', { desc = '[T]est [F]ile' })
-      vim.keymap.set('n', '<leader>tl', ':TestLast<CR>', { desc = '[T]est [L]ast' })
-    end
-  }
+  'vim-test/vim-test',
+  'andymass/vim-matchup',
 
   -- TODO: check this out
   -- https://github.com/rgroli/other.nvim

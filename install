@@ -24,12 +24,12 @@ else
   print_success "Fish"
 fi
 
-# Alacritty
-if [[ -e ~/.config/alacritty ]]; then
-  print_warning "Alacritty"
+# Kitty
+if [[ -e ~/.config/kitty ]]; then
+  print_warning "Kitty"
 else
-  ln -s $dotfiles_dir/config/alacritty/ ~/.config/alacritty
-  print_success "Alacritty"
+  ln -s $dotfiles_dir/config/kitty/ ~/.config/kitty
+  print_success "Kitty"
 fi
 
 # Git
@@ -69,35 +69,31 @@ echo "✅ Dotfiles installed."
 
 
 
-# === Install Alacritty 
+# === Install Kitty 
 
+APPLICATIONS_DIR=~/Applications
 TMP_INSTALL_DIR=dotfiles_install
 
 cd $TMPDIR
+if [[ -d $TMP_INSTALL_DIR ]]; then
+  rm -R $TMP_INSTALL_DIR
+fi
 mkdir $TMP_INSTALL_DIR
 cd $TMP_INSTALL_DIR
 
-alacritty_version=v0.11.0
-alacritty_url="https://github.com/alacritty/alacritty/releases/download/$alacritty_version"
+kitty_version="0.29.2"
+kitty_url="https://github.com/kovidgoyal/kitty/releases/download/v$kitty_version"
+kitty_dmg_filename="kitty-$kitty_version.dmg"
 
-curl -L -O "$alacritty_url/Alacritty-$alacritty_version.dmg"
+curl -L -O "$kitty_url/$kitty_dmg_filename"
 
-hdiutil attach Alacritty-$alacritty_version.dmg
-
-cp -R /Volumes/Alacritty/Alacritty.app ~/Applications
-
-hdiutil detach /Volumes/Alacritty
-
-curl -L -O "$alacritty_url/alacritty.info"
-sudo tic -xe alacritty,alacritty-direct alacritty.info
-
-infocmp alacritty
-
-curl -L -O "$alacritty_url/alacritty.fish"
-cp alacritty.fish $fish_complete_path[1]
+curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin \
+    installer=$kitty_dmg_filename \
+    dest=$APPLICATIONS_DIR \
+    launch=n
 
 CURRENT_DIR=$(pwd)
 cd $dotfiles_dir
 rm -rf $CURRENT_DIR
 
-echo "✅ Alacritty installed."
+echo "✅ Kitty installed."

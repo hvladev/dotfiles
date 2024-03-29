@@ -1,8 +1,16 @@
 # Terminal
 # set -x TERM xterm-kitty
+# set -x TERM alacritty
+
+# WezTerm
+fish_add_path --global ~/Applications/WezTerm.app/Contents/MacOS
 
 # Homebrew
 fish_add_path --global $(brew --prefix)
+
+# bun
+set --export BUN_INSTALL $HOME/.bun
+fish_add_path --global $BUN_INSTALL/bin
 
 # Locale variables
 set -x LC_ALL en_US.UTF-8

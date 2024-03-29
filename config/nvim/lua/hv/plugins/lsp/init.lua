@@ -17,6 +17,7 @@ return {
   },
   config = function()
     local servers = {
+      'astro',
       'jsonls',
       'lua_ls',
       'ruby_ls',
