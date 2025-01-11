@@ -1,0 +1,24 @@
+# macOS set-up checklist
+
+[ ] - System Preferences
+[ ] - ~/.ssh
+[ ] - ~/.gnupg
+[ ] - `ln -s ./config/ghostty/ ~/.config/ghostty`
+[ ] - Install Fonts
+    [ ] - Hack from https://sourcefoundry.org/hack/
+[ ] - App Store (Pages, Numbers, Keynote, iMovie, GarageBand, Xcode)
+[ ] - mkdir ~/Applications
+[ ] - Raycast
+[ ] - Ghostty
+[ ] - OrbStack
+[ ] - Discord
+[ ] - Firefox
+[ ] - Google Chrome
+[ ] - Slack
+[ ] - Spotify
+[ ] - Steam
+[ ] - Telegram
+[ ] - The Unarchiver
+[ ] - Transmission
+[ ] - VLC
+[ ] - Copy data from the backup drive
