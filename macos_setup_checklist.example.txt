@@ -7,7 +7,9 @@ macOS set-up checklist
 [ ] - git clone git@github.com:hrvladev/dotfiles.git && cd dotfiles && ./install
 [ ] - ~/.scratchpads
 [ ] - ~/.config/tmuxinator/
-[ ] - Install Fonts [ Hack ]
+[ ] - Install Fonts
+    [ ] - Hack from https://sourcefoundry.org/hack/
+    [ ] - NerdFontsSymbolsOnly.zip from https://github.com/ryanoasis/nerd-fonts/releases (needed for Kitty terminal)
 [ ] - Alacritty
     [ ] - Fish shell completions (alacritty.fish)
 [ ] - Homebrew (https://brew.sh)

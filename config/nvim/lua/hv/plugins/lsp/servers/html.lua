@@ -1,6 +1,6 @@
 return {
   setup = function(lspconfig, on_attach, capabilities)
-    lspconfig.ruby_ls.setup({
+    lspconfig.html.setup({
       on_attach = on_attach,
       capabilities = capabilities,
     })

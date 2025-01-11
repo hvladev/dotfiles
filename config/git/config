@@ -15,21 +15,27 @@
 [push]
 	default = current
 [core]
-	pager = diff-so-fancy | less --tabs=4 -RFX
+	pager = delta
+[interactive]
+  diffFilter = delta --color-only
 [color]
 	ui = true
-[color "diff-highlight"]
-	oldNormal = red bold
-	oldHighlight = red bold 52
-	newNormal = green bold
-	newHighlight = green bold 22
-[color "diff"]
-	meta = 11
-	frag = magenta bold
-	commit = yellow bold
-	old = red bold
-	new = green bold
-	whitespace = red reverse
+[delta]
+  navigate = true
+  line-numbers = true
+  syntax-theme = none
+  minus-style                   = "#ee0000" "#3f0001"
+  minus-non-emph-style          = "#ee0000" "#3f0001"
+  minus-emph-style              = "#000000" "#ff0000"
+  minus-empty-line-marker-style = "#ee0000" "#3f0001"
+  plus-style                    = "#00dd00" "#002800"
+  plus-non-emph-style           = "#00dd00" "#002800"
+  plus-emph-style               = "#000000" "#00dd00"
+  plus-empty-line-marker-style  = "#00dd00" "#002800"
+[merge]
+  conflictstyle = diff3
+[diff]
+  colorMoved = default
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f

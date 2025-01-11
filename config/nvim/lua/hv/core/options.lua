@@ -7,7 +7,6 @@ opt.completeopt = "menuone,preview,noselect"
 opt.cursorline = true
 opt.number = true
 opt.pumheight = 10
-opt.relativenumber = true
 opt.scrolloff = 8
 opt.showmode = false
 opt.showtabline = 1

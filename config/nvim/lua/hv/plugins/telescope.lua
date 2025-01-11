@@ -8,6 +8,9 @@ return {
     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
   },
   config = function()
+    local actions = require('telescope.actions')
+    local action_state = require('telescope.actions.state')
+
     require('telescope').setup({
       defaults = {
         prompt_prefix = '     ',
@@ -28,6 +31,36 @@ return {
           },
         },
       },
+      pickers = {
+        buffers = {
+          mappings = {
+            i = {
+              ['<C-S-D>'] = 'delete_buffer',
+            },
+          },
+        },
+        find_files = {
+          mappings = {
+            i = {
+              ['<C-o>'] = function(prompt_bufnr)
+                local entry = action_state.get_selected_entry()
+                local directory = entry.value:match("(.*/)")
+
+                actions.close(prompt_bufnr)
+                vim.cmd.edit(directory)
+              end,
+              ['<C-M-o>'] = function(prompt_bufnr)
+                local entry = action_state.get_selected_entry()
+                local directory = entry.value:match("(.*/)")
+
+                actions.close(prompt_bufnr)
+                vim.cmd.vsplit()
+                vim.cmd.edit(directory)
+              end,
+            },
+          },
+        },
+      }
     })
 
     require('telescope').load_extension('fzf')
@@ -82,10 +115,13 @@ return {
     -- [[ Mappings ]]
     local b = require('telescope.builtin')
     local map = vim.keymap.set
-    map('n', '<leader>sf', b.find_files, { desc = '[S]earch [F]iles' })
-    map('n', '<leader>sb', b.buffers, { desc = '[S]earch existing [B]uffers' })
+    map('n', '<leader>j', b.find_files, { desc = '[j] Search files' })
+    map('n', '<leader>k', b.buffers, { desc = '[k] Search existing buffers' })
+    map('n', '<leader>sm', b.marks, { desc = '[S]earch [M]arks' })
     map('n', '<leader>sw', b.grep_string, { desc = '[S]earch current [W]ord' })
     map('n', '<leader>sg', b.live_grep, { desc = '[S]earch by [G]rep' })
+    -- Search in specific directories:
+    -- :Telescope live_grep search_dirs=db/migrate,app/models
     map('n', '<leader>/', function()
       b.current_buffer_fuzzy_find({ previewer = false })
     end, { desc = '[/] Fuzzily search in current buffer' })
@@ -94,7 +130,8 @@ return {
     map('n', '<leader>sd', b.diagnostics, { desc = '[S]earch [D]iagnostics' })
     map('n', '<leader>s:', b.command_history, { desc = '[:] Search command history' })
     map('n', '<leader>s/', b.search_history, { desc = '[/] Search search history' })
-    map('n', '<leader>sr', b.resume, { desc = '[S]earch [R]esume' })
+    map('n', '<leader>sr', b.registers, { desc = '[S]earch [r]egisters' })
+    map('n', '<leader>sR', b.resume, { desc = '[S]earch [R]esume' })
     map('n', '<leader>si', b.builtin, { desc = '[S]earch built-[I]n pickers' })
   end
 }

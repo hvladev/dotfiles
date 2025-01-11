@@ -1,8 +1,16 @@
 # Terminal
 # set -x TERM xterm-kitty
+# set -x TERM alacritty
+
+# WezTerm
+fish_add_path --global ~/Applications/WezTerm.app/Contents/MacOS
 
 # Homebrew
 fish_add_path --global $(brew --prefix)
+
+# bun
+set --export BUN_INSTALL $HOME/.bun
+fish_add_path --global $BUN_INSTALL/bin
 
 # Locale variables
 set -x LC_ALL en_US.UTF-8
@@ -40,3 +48,18 @@ abbr --add --global hr heroku run
 abbr --add --global lg lazygit
 
 abbr --add --global r bin/rails
+
+abbr miex 'iex -S mix'
+
+# pnpm
+set -gx PNPM_HOME "/Users/hvladev/Library/pnpm"
+if not string match -q -- $PNPM_HOME $PATH
+  set -gx PATH "$PNPM_HOME" $PATH
+end
+# pnpm end
+
+# Mise is everything version manager
+/Users/hvladev/.local/bin/mise activate fish | source
+
+# Pixi
+fish_add_path /Users/hvladev/.pixi/bin
