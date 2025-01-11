@@ -24,14 +24,6 @@ else
   print_success "Fish"
 fi
 
-# Ghostty
-if [[ -e ~/.config/ghostty ]]; then
-  print_warning "Ghostty"
-else
-  ln -s $dotfiles_dir/config/ghostty/ ~/.config/ghostty
-  print_success "Ghostty"
-fi
-
 # Git
 if [[ -e ~/.config/git ]]; then
   print_warning "Git"
@@ -40,12 +32,12 @@ else
   print_success "Git"
 fi
 
-# NeoVim
+# Neovim
 if [[ -e ~/.config/nvim ]]; then
-  print_warning "NeoVim"
+  print_warning "Neovim"
 else
   ln -s $dotfiles_dir/config/nvim/ ~/.config/nvim
-  print_success "NeoVim"
+  print_success "Neovim"
 fi
 
 # tmux

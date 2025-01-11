@@ -33,7 +33,7 @@
     plus-emph-style               = "#000000" "#00dd00"
     plus-empty-line-marker-style  = "#00dd00" "#002800"
 [merge]
-    conflictstyle = diff3
+    conflictstyle = zdiff3
 [diff]
     colorMoved = default
 [filter "lfs"]
